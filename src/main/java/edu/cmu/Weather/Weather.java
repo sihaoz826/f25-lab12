@@ -2,26 +2,43 @@ package edu.cmu.Weather;
 
 public class Weather {
     private WeatherService weatherService;
-    private boolean inches;
+    private LengthUnit lengthUnit;
 
     /**
-     * Sets the length scale for rainfall.
+     * Constructs a new Weather instance with the specified WeatherService.
+     * Defaults to millimeters as the length unit.
      *
-     * @param inches if true, sets the scale to inches; if false, sets the scale to millimeters.
+     * @param weatherService the service to use for retrieving weather data
      */
-    public void setLengthScale(boolean inches) {
-        this.inches = inches;
+    public Weather(WeatherService weatherService) {
+        if (weatherService == null) {
+            throw new IllegalArgumentException("WeatherService cannot be null");
+        }
+        this.weatherService = weatherService;
+        this.lengthUnit = LengthUnit.MILLIMETERS;
     }
 
     /**
-     * Retrieves the rainfall measurement over the last 24 hours from the weather service in the preferred scale.
+     * Sets the length unit for rainfall measurements.
+     *
+     * @param lengthUnit the unit to use (INCHES or MILLIMETERS)
+     */
+    public void setLengthScale(LengthUnit lengthUnit) {
+        if (lengthUnit == null) {
+            throw new IllegalArgumentException("LengthUnit cannot be null");
+        }
+        this.lengthUnit = lengthUnit;
+    }
+
+    /**
+     * Retrieves the rainfall measurement over the last 24 hours from the weather service in the preferred unit.
+     * The weather service returns rainfall in millimeters. This method converts to inches if requested.
      * 
-     * @return the rainfall amount. If the measurement is in inches, it returns the value as is.
-     *         If the measurement is not in inches, it converts the value to millimeters.
+     * @return the rainfall amount in the preferred unit (inches or millimeters)
      */
     public double getRainfall() {
         double wsRainfall = weatherService.getRainfall();
-        if (inches) {
+        if (lengthUnit == LengthUnit.INCHES) {
             return wsRainfall / 25.4;
         } else {
             return wsRainfall;
